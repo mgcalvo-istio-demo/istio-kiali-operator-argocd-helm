@@ -1,13 +1,13 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: istio-system
+  name: kiali-operator
   namespace: argocd
 spec:
   clusterResourceWhitelist:
   - group: '*'
     kind: '*'
-  description: istio
+  description: kiali-operator
   destinations:
   - namespace: '*'
     server: '*'
@@ -20,34 +20,30 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: istio-base
+  name: kiali-operator
   namespace: argocd
 spec:
   generators:
   - clusters: {}
   template:
     metadata:
-      name: istio-base
+      name: kiali-operator
     spec:
       destination:
-        namespace: istio-system
+        namespace: kiali-operator
         server: https://kubernetes.default.svc
       ignoreDifferences:
       - kind: ServiceAccount
         jsonPointers:
         - /imagePullSecrets
         - /secrets
-      - group: admissionregistration.k8s.io
-        kind: ValidatingWebhookConfiguration
-        jsonPointers:
-          - /webhooks/0/failurePolicy
-      project: istio-system
+      project: kiali-operator
       source:
         helm:
           valueFiles:
-          - values-base.yaml
+          - values.yaml
         path: .
-        repoURL: https://github.com/mgcalvo-istio-demo/istio-base-argocd-helm.git
+        repoURL: https://github.com/mgcalvo-istio-demo/istio-kiali-operator-argocd-helm.git
         targetRevision: main
       syncPolicy:
         automated:
